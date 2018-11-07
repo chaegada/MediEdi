@@ -16,7 +16,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        
+        <activity android:name=".Medicine"></activity>
+        <activity android:name=".Medicine_List"></activity>
         <activity android:name=".Translation"></activity>
         <activity android:name=".List"></activity>
         <activity android:name=".Select_Function"></activity>
