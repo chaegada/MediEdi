@@ -1,5 +1,9 @@
 # MediEdi
 
+
+zxing barcode 출처: https://github.com/journeyapps/zxing-android-embedded
+
+
 <b>depencency</b>
 
 implementation fileTree(dir: 'libs', include: ['*.jar'])
