@@ -13,12 +13,17 @@ public class SelectSearch extends AppCompatActivity {
         setContentView(R.layout.select_search);
 
         TextView setting=(TextView)findViewById(R.id.setting);
+         TextView tv_word_search=(TextView)findViewById(R.id.search_word);
+        TextView tv_list_search=(TextView)findViewById(R.id.search_list);
         Button word_search=(Button)findViewById(R.id.button_search_word);
         Button list_search=(Button)findViewById(R.id.button_search_list);
 
+
         Intent intent=new Intent(this.getIntent());
         final String s=intent.getStringExtra("translate_result");
-        final String lang=intent.getStringExtra("lang");
+        
+          SharedPreferences prefs = getSharedPreferences("AppName", Context.MODE_PRIVATE);
+        String lang = prefs.getString("lang", "English");
 
         if(lang.equalsIgnoreCase("English")) {
           word_search.setText("Search for words");
@@ -39,9 +44,9 @@ public class SelectSearch extends AppCompatActivity {
         }
 
         else {
-            word_search.setText("단어로 검색");
-            list_search.setText("리스트로 검색");
-            setting.setText("강조 방법 선택");
+           tv_word_search.setText("用单词搜索");
+            tv_list_search.setText("列表搜索");
+            setting.setText("选择强调方法");
         }
 
 

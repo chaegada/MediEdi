@@ -21,6 +21,8 @@ import java.util.Set;
 
 public class List extends AppCompatActivity {
 
+     String st_button="";
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list);
@@ -28,7 +30,7 @@ public class List extends AppCompatActivity {
         ArrayList<String> saved_items= getListFromLocal("emphasis_words");
         final ArrayList<String> items;
 
-        if(saved_items.isEmpty()) items = new ArrayList<String>();
+        if(saved_items==null) items = new ArrayList<String>();
         else items=saved_items;
 
         final ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_single_choice, items);
@@ -41,93 +43,85 @@ public class List extends AppCompatActivity {
 
         Button addButton = (Button) findViewById(R.id.add);
         Button modifyButton = (Button) findViewById(R.id.modify);
-        Button deleteButton = (Button) findViewById(R.id.delete);
-        Button saveButton=(Button)findViewById(R.id.send);
+        final Button deleteButton = (Button) findViewById(R.id.delete);
+        final Button saveButton=(Button)findViewById(R.id.send);
+        final LinearLayout list_layout=(LinearLayout)findViewById(R.id.list_layout);
+        final LinearLayout button_layout=(LinearLayout)findViewById(R.id.linear_layout_button);
+
+        button_layout.setVisibility(View.VISIBLE);
+        list_layout.setVisibility(View.GONE);
 
         Intent intent=new Intent(this.getIntent());
-        final String lang=intent.getStringExtra("lang");
-        final String empty;
-        final String overlap;
 
+        SharedPreferences prefs = getSharedPreferences("AppName", Context.MODE_PRIVATE);
+        String lang = prefs.getString("lang", "English");
+
+        final String empty;
+        final String overlap, delete_string;
+        final String add, modify, delete, save;
 
         if(lang.equalsIgnoreCase("English")) {
-          addButton.setText("add");
-          modifyButton.setText("modify");
-          deleteButton.setText("delete");
-          saveButton.setText("save");
-          empty="Please enter an item to emphasize";
-          overlap="There is already the same item.";
+            add="add";
+            modify="modify";
+            delete="delete";
+            save="save";
+            empty="Please enter an item to emphasize";
+            overlap="There is already the same item.";
+            delete_string="Check the terms you want to delete and press the Delete button.";
         }
 
         else if(lang.equalsIgnoreCase("Thai")) {
-            addButton.setText("การเพิ่ม");
-            modifyButton.setText("การแก้ไข");
-            deleteButton.setText("การกำจัด");
-            saveButton.setText("การเก็บ");
+            add="การเพิ่ม";
+            modify="การแก้ไข";
+            delete="การกำจัด";
+            save="การเก็บ";
             empty="กรุณาระบุรายการที่จะเน้น";
             overlap="มีรายการเดียวกัน";
+            delete_string="หลังจากตรวจสอบรายการที่คุณต้องการลบ กรุณากดปุ่มลบค่ะ";
         }
 
         else if(lang.equalsIgnoreCase("Viet")) {
-            addButton.setText("Cộng thêm");
-            modifyButton.setText("Biên tập");
-            deleteButton.setText("Sự loại bỏ");
-            saveButton.setText("Lưu giữ");
+            add="Cộng thêm";
+            modify="Biên tập";
+            delete="Sự loại bỏ";
+            save="Lưu giữ";
             empty="Vui lòng nhập mục tiêu nhấn mạnh.";
             overlap="Đã có một hạng mục như vậy";
+            delete_string="Sau khi kiểm tra hạng mục muốn xóa thì nhấn nút xóa.";
         }
 
         else {
-            addButton.setText("추가");
-            modifyButton.setText("수정");
-            deleteButton.setText("삭제");
-            saveButton.setText("저장");
-            empty="강조할 항목을 입력해주세요";
-            overlap="이미 같은 항목이 있습니다";
+            add="追加";
+            modify="修整";
+            delete="删除";
+            save="贮藏";
+            empty="请输入需要强调的项目";
+            overlap="已经有相同的项目了";
+            delete_string="确认想要删除的项目后按删除按钮.";
         }
 
+        deleteButton.setText(delete);
+        addButton.setText(add);
+        modifyButton.setText(modify);
 
         addButton.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                String add;
-                add=edittext.getText().toString();
-
-                if(add.equalsIgnoreCase("")){
-                    Toast.makeText(List.this, empty, Toast.LENGTH_SHORT).show();
-                    edittext.requestFocus();
-                    return;
-                }
-
-                for(int j=items.size()-1; j>=0; j--)
-                if(items.get(j).equals(add)) {
-                    Toast.makeText(List.this, overlap, Toast.LENGTH_SHORT).show();
-                    edittext.requestFocus();
-                    return;
-                }
-
-                items.add(add);
-
-                adapter.notifyDataSetChanged();
+                list_layout.setVisibility(View.VISIBLE);
+                edittext.setVisibility(View.VISIBLE);
+                st_button="add";
+                saveButton.setText(add);
+                button_layout.setVisibility(View.GONE);
             }
         });
 
 
         modifyButton.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                int count, checked;
-                String edit;
-                count = adapter.getCount();
-
-                if (count > 0) {
-                    checked = listview.getCheckedItemPosition();
-                    if (checked > -1 && checked < count) {
-                        edit=edittext.getText().toString();
-                        items.set(checked, edit);
-                        adapter.notifyDataSetChanged();
-                    }
-                }
-
-
+                list_layout.setVisibility(View.VISIBLE);
+                edittext.setVisibility(View.VISIBLE);
+                st_button="modify";
+                saveButton.setText(modify);
+                button_layout.setVisibility(View.GONE);
             }
         });
 
@@ -136,21 +130,13 @@ public class List extends AppCompatActivity {
             public void onClick(View v) {
                 int count, checked;
                 count = adapter.getCount();
-
-                if (count > 0) {
-
-                    checked = listview.getCheckedItemPosition();
-
-                    if (checked > -1 && checked < count) {
-                        items.remove(checked);
-
-                        listview.clearChoices();
-
-                        adapter.notifyDataSetChanged();
-                    }
-
-                }
-
+                list_layout.setVisibility(View.VISIBLE);
+                edittext.setVisibility(View.GONE);
+                deleteButton.setGravity(Gravity.CENTER);
+                saveButton.setText(delete);
+                st_button="delete";
+                Toast.makeText(List.this, delete_string, Toast.LENGTH_LONG).show();
+                button_layout.setVisibility(View.GONE);
             }
 
         });
@@ -159,10 +145,61 @@ public class List extends AppCompatActivity {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                String text=edittext.getText().toString();
+                int count, checked;
+                count = adapter.getCount();
+
+                boolean bool_add=st_button.equalsIgnoreCase("add");
+                boolean bool_modify=st_button.equalsIgnoreCase("modify");
+
+                if(bool_add&bool_modify) {
+
+                    if (text.equalsIgnoreCase("")) {
+                        Toast.makeText(List.this, empty, Toast.LENGTH_SHORT).show();
+                        edittext.requestFocus();
+                        return;
+                    }
+
+                    for (int j = items.size() - 1; j >= 0; j--)
+                        if (items.get(j).equals(text)) {
+                            Toast.makeText(List.this, overlap, Toast.LENGTH_SHORT).show();
+                            edittext.requestFocus();
+                            return;
+                        }
+                }
+
+                if (bool_add) {
+                    items.add(text);
+                } else if (bool_modify) {
+                    if (count > 0) {
+                        checked = listview.getCheckedItemPosition();
+                        if (checked > -1 && checked < count) {
+                            items.set(checked, text);
+                        }
+                    }
+                }
+
+
+                else if(st_button.equalsIgnoreCase("delete")){
+                    if (count > 0) {
+                        checked = listview.getCheckedItemPosition();
+                        if (checked > -1 && checked < count) {
+                            items.remove(checked);
+                            listview.clearChoices();
+                            adapter.notifyDataSetChanged();
+                        }
+                    }
+                }
+
+                adapter.notifyDataSetChanged();
                 final ArrayList<String> sending_items = items;
-       saveListInLocal(sending_items, "emphasis_words");
+                saveListInLocal(sending_items, "emphasis_words");
+                button_layout.setVisibility(View.VISIBLE);
+                list_layout.setVisibility(View.GONE);
+                edittext.setText("");
             }
-                });
+        });
 
     }
 

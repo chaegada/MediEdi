@@ -15,6 +15,11 @@ public class Select_Function extends AppCompatActivity {
     Button selectHospital;
     Button selectLink;
     Button selectSetting;
+    
+    TextView tvTranslation;
+    TextView tvHospital;
+    TextView tvLink;
+    TextView tvSetting;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,10 +31,25 @@ public class Select_Function extends AppCompatActivity {
         selectLink=(Button)findViewById(R.id.select_button_link);
         selectSetting=(Button)findViewById(R.id.select_button_setting);
 
-        Intent intent=new Intent(this.getIntent());
-        final String s=intent.getStringExtra("lang");
+        tvTranslation=(TextView)findViewById(R.id.select_translation);
+        tvHospital=(TextView)findViewById(R.id.select_hospital);
+        tvLink=(TextView)findViewById(R.id.select_link);
+        tvSetting=(TextView) findViewById(R.id.select_setting);
+        
+        SharedPreferences prefs = getSharedPreferences("AppName", Context.MODE_PRIVATE);
+        int first=prefs.getInt("first_start",0);
+
+        if(first==0){
+            Intent intent=new Intent(Select_Function.this, Change_Lang.class);
+            startActivity(intent);
+            finish();
+        }
+
+        final String lang = prefs.getString("lang", "English");
+
         TextView textView=(TextView)findViewById(R.id.selected_lang);
-        textView.setText(s);
+        textView.setText(lang);
+
 
         if(s.equalsIgnoreCase("English")) {
             selectSetting.setText("Setting");
@@ -53,18 +73,17 @@ public class Select_Function extends AppCompatActivity {
         }
 
         else {
-            selectSetting.setText("환경설정");
-            selectTranslation.setText("의약품 번역");
-            selectLink.setText("다문화 가정 링크");
-            selectHospital.setText("병원 위치 찾기");
+                  tvSetting.setText("配置环境");
+            tvTranslation.setText("医药品翻译");
+            tvLink.setText("多文化家庭之间");
+            tvHospital.setText("医院定位");
         }
 
-        selectTranslation.setOnClickListener(new View.OnClickListener() {
+         selectTranslation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String selected_lang=s;
-                Intent intent=new Intent(Select_Function.this, Translation.class);
-                intent.putExtra("lang",selected_lang);
+                Intent intent=new Intent(Select_Function.this, SelectTranslation.class);
+                intent.putExtra("lang", lang);
                 startActivity(intent);
             }
         });
@@ -73,9 +92,30 @@ public class Select_Function extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent=new Intent(Select_Function.this, Setting.class);
-                intent.putExtra("lang", s);
+                intent.putExtra("lang", lang);
+                startActivity(intent);
+            }
+        });
+
+        selectHospital.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+
+                Intent intent=new Intent(Select_Function.this, HospitalMap.class);
+                 intent.putExtra("lang", lang);
+                startActivity(intent);
+            }
+        });
+
+        selectLink.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent=new Intent(Select_Function.this, Link.class);
+                intent.putExtra("lang", lang);
                 startActivity(intent);
             }
         });
     }
     }
+    
