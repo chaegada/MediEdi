@@ -1,21 +1,12 @@
 package com.happy.trans;
 
-import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import android.os.StrictMode;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserFactory;
+import java.net.URL;
 import java.net.URLEncoder;
-import java.util.concurrent.ExecutionException;
-
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
 
 public class Medicine extends AppCompatActivity {
 
@@ -25,87 +16,86 @@ public class Medicine extends AppCompatActivity {
 
     }
 
-    public static String searchMedicine(String drug_code){
-
-
-        String drug_info = null;
-        Log.d("drug_code",drug_code);
-
-        try {
-            String searchUrl = "http://localapi.health.kr:8090/result_drug.localapi?drug_cd=" +
-                    URLEncoder.encode(drug_code,"UTF-8") + "&callback=";
-            drug_info = new getData().execute(searchUrl).get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+    public static String searchMedicine(String name){
+        if (android.os.Build.VERSION.SDK_INT > 9) {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
         }
 
-        return drug_info;
-    }
+        String key = "L%2B%2BeR%2FYwxRHLHAFUrX%2Fn8kURTNYPt4Ba44UyufSd4vkAYpMAYuPUgOn%2Fa7wq84jd5ErGrfSO4BdBFVDdKFCTjg%3D%3D";
 
-    private static class getData extends AsyncTask<String, Integer, String> {
+        String[] Operation = {"getSpcifyAgrdeTabooInfoList", "getPwnmTabooInfoList",
+                "getCpctyAtentInfoList", "getMdctnPdAtentInfoList", "getOdsnAtentInfoList", "getDurPrdlstInfoList"};
+        String[] typeName = {"특정연령대금기", "임부금기", "용량주의", "투여기간주의", "노인주의", "품목정보"};
+        String itemName = name;
 
-        @Override
-        protected String doInBackground(String... search) {
-            String contents = "null";
-            boolean check = FALSE;
+        boolean s = false;
+        boolean t = false;
+        boolean prohbt_content = false;
 
-            try {
-                ConnectServer connectServer = new ConnectServer();
-                contents = connectServer.requestGet(search[0]);
-                check = TRUE;
+        String st = null;
+        String tt = null;
+        String printing = "약품명 : " + itemName;
+        String prohbt_content_val = null;
 
-                Log.d("RRRRRR", contents.toString());
-            } catch (IOException e) {
-                Log.d("RR", e.toString());
-            }
-            if (!check) return "존재하지 않는 결과입니다.";
-
-            StringBuffer jsonData = new StringBuffer();
+        for (int i = 5; i >= 0; i--) {
+            prohbt_content_val = "없음";
 
             try {
-                JSONArray jarray = new JSONArray(contents);
-                for (int i = 0; i < jarray.length(); i++) {
-                    JSONObject jObject = null;
-                    jObject = jarray.getJSONObject(i);
+                URL url = new URL("http://apis.data.go.kr/1470000/DURPrdlstInfoService/" + URLEncoder.encode(Operation[i], "UTF-8")
+                        + "?ServiceKey=" + key + "&typeName=" + URLEncoder.encode(typeName[i], "UTF-8") +
+                        "&itemName=" + URLEncoder.encode(itemName, "UTF-8") + "&numOfRows=3&pageNo=1"); //검색 URL부분
 
-                    String ingredient = jObject.getString("sunb");
-                    while (ingredient.indexOf("<") != -1)
-                        ingredient = ingredient.indexOf("<") <= 1 ? ingredient.substring(ingredient.indexOf(">") + 1, ingredient.length()) :
-                                ingredient.substring(0, ingredient.indexOf("<") - 1) + ingredient.substring(ingredient.indexOf(">") + 1, ingredient.length());
-                    ingredient = ingredient.replaceAll("@", "\n");
-                    String extraeffect = jObject.getString("medititle");
-                    if (extraeffect.indexOf("[") != -1)
-                        extraeffect = extraeffect.substring(extraeffect.indexOf("]") + 1, extraeffect.length());
-                    extraeffect = extraeffect.replaceAll("br", "\n");
-                    String effect = jObject.getString("effect");
-                    if (effect.indexOf("[") != -1)
-                        effect = effect.substring(effect.indexOf("]") + 1, effect.length());
-                    effect = effect.replaceAll("br", "\n");
-                    String dosage = jObject.getString("dosage");
-                    if (dosage.indexOf("[") != -1)
-                        dosage = dosage.substring(dosage.indexOf("]") + 1, dosage.length());
-                    while (dosage.indexOf("<") != -1)
-                        dosage = dosage.indexOf("<") <= 1 ? dosage.substring(dosage.indexOf(">") + 1, dosage.length()) :
-                                dosage.substring(0, dosage.indexOf("<") - 1) + dosage.substring(dosage.indexOf(">") + 1, dosage.length());
-                    dosage = dosage.replaceAll("br", "\n");
-                    String caution = jObject.getString("caution");
-                    String guide = jObject.getString("mediguide");
-                    while (guide.indexOf("<") != -1)
-                        guide = guide.indexOf("<") <= 1 ? guide.substring(guide.indexOf(">") + 1, guide.length()) :
-                                guide.substring(0, guide.indexOf("<") - 1) + guide.substring(guide.indexOf(">") + 1, guide.length());
-                    guide = guide.replaceAll("br", "\n");
+                XmlPullParserFactory parserCreator = XmlPullParserFactory.newInstance();
+                XmlPullParser parser = parserCreator.newPullParser();
 
-                    jsonData.append("성분 : " + ingredient + "\n효능,효과 : " + effect + "\n" + extraeffect +
-                            "\n\n용법용량 : " + dosage + "\n\n복약정보\n" + guide );
+                parser.setInput(url.openStream(), null);
+                int parserEvent = parser.getEventType();
+
+                while (parserEvent != XmlPullParser.END_DOCUMENT) {
+                    switch (parserEvent) {
+                        case XmlPullParser.START_TAG://parser가 시작 태그를 만나면 실행
+                            if (parser.getName().equalsIgnoreCase("STORAGE_METHOD")) {
+                                s = true;
+                            }
+                            if (parser.getName().equalsIgnoreCase("VALID_TERM")) {
+                                t = true;
+                            }
+                            if (parser.getName().equalsIgnoreCase("PROHBT_CONTENT")) {
+                                prohbt_content = true;
+                            }
+                            break;
+
+                        case XmlPullParser.TEXT://parser가 내용에 접근했을때
+                            if (s) { //true일 때 태그의 내용을 저장.
+                                st = parser.getText();
+                                s = false;
+                            }
+                            if (t) {
+                                tt = parser.getText();
+                                t = false;
+                            }
+                            if (prohbt_content) {
+                                prohbt_content_val = parser.getText();
+                                prohbt_content = false;
+                            }
+
+                            break;
+                    }
+                    parserEvent = parser.next();
                 }
-            } catch (JSONException e1) {
-                e1.printStackTrace();
+                if (i == 5) {
+                    if (st == null && tt == null) {
+                        printing = "해당하는 약품이 존재하지 않습니다.\n다시 입력해주세요.";
+                        break;
+                    } else printing += "\n\n저장방법 : " + st + "\n\n유효기간: " + tt;
+                } else {
+                    printing += "\n\n" + typeName[i] + " : " + prohbt_content_val.replaceAll("\"", "").replaceAll("\\.", " ");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            return jsonData.toString();
         }
+        return printing;
     }
 }
