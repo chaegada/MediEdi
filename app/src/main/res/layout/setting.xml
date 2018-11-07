@@ -3,43 +3,106 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:layout_margin="20dp"
     >
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1">
+        android:layout_weight="4">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:gravity="center_horizontal|center_vertical"
+            android:textSize="20dp"
             android:id="@+id/tvSetting"
-         />
+            />
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:layout_weight="0.5">
+        android:layout_weight="1"
+        android:orientation="vertical">
 
-        <Button
-            android:id="@+id/button_change_lang"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:onClick="onClick"
-            />
+            android:orientation="vertical">
 
-        <Button
-            android:id="@+id/button_change_disease"
+            <com.happy.trans.SquareButton
+                android:id="@+id/button_change_disease"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="120dp"
+                android:layout_marginRight="120dp"
+                android:layout_weight="1"
+                android:background="@drawable/checklist_button"
+                android:onClick="onClick" />
+
+            <TextView
+                android:id="@+id/change_disease"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal|center_vertical"
+                android:textSize="20dp" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:onClick="onClick"
-         />
+            android:orientation="vertical">
 
+            <com.happy.trans.SquareButton
+                android:id="@+id/button_change_lang"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="120dp"
+                android:layout_marginRight="120dp"
+                android:layout_weight="1"
+                android:background="@drawable/change_lang_button"
+                android:onClick="onClick" />
 
+            <TextView
+                android:id="@+id/change_lang"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal|center_vertical"
+                android:textSize="20dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <com.happy.trans.SquareButton
+                android:id="@+id/button_change_emphasis"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="120dp"
+                android:layout_marginRight="120dp"
+                android:layout_weight="1"
+                android:background="@drawable/change_emphasis_button"
+                android:onClick="onClick" />
+
+            <TextView
+                android:id="@+id/change_emphasis"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal|center_vertical"
+                android:textSize="20dp" />
+
+        </LinearLayout>
     </LinearLayout>
+
 </LinearLayout>
