@@ -14,13 +14,17 @@
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="put your googlemap key here" />
-       
+
+
+        <activity android:name=".Medicine_List"></activity>
+
         <activity android:name=".WordSearch"></activity>
         <activity android:name=".InternetAccess"></activity>
         <activity android:name=".Change_Lang"></activity>
         <activity android:name=".Link"></activity>
         <activity android:name=".Change_Emphasis"></activity>
         <activity android:name="Barcode"></activity>
+
         <activity android:name=".Translation"></activity>
         <activity android:name=".List"></activity>
         <activity android:name=".Select_Function"></activity>
