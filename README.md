@@ -75,5 +75,5 @@ implementation 'com.journeyapps:zxing-android-embedded:3.5.0'
 implementation 'net.sourceforge.jexcelapi:jxl:2.6.12'  
 
 ## ▸ 5. 출처
-### ▸ zxing barcode 출처: https://github.com/journeyapps/zxing-android-embedded
+ ▸ zxing barcode 출처: https://github.com/journeyapps/zxing-android-embedded
 
