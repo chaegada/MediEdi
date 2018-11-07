@@ -1,0 +1,205 @@
+package com.happy.trans;
+
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.Toast;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+
+public class Medicine_List extends AppCompatActivity implements View.OnClickListener {
+
+    List_Element click_listener = new List_Element();
+
+    ArrayList<List_Element> oData = new ArrayList<>();
+    private ListView medicine_ListView = null;
+
+    EditText et_medicine_list;
+    Button bt_medicine_list;
+    String data;
+    String lang;
+    String empty, search, hint;
+
+    final getList new_get = new getList();
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState)
+    {   super.onCreate(savedInstanceState);
+        setContentView(R.layout.medicine_list);
+
+        SharedPreferences prefs = getSharedPreferences("AppName", Context.MODE_PRIVATE);
+        lang = prefs.getString("lang", "English");
+
+        click_listener.onClickListener=this;
+
+        et_medicine_list=(EditText)findViewById(R.id.et_medicine_list);
+        bt_medicine_list=(Button)findViewById(R.id.bt_medicine_list);
+
+        if(lang.equalsIgnoreCase("English")) {
+            search="search";
+            hint="Please enter the name of the medication to search for";
+            empty="Please enter the name of the medicine.";
+        }
+
+        else if(lang.equalsIgnoreCase("Thai")) {
+            search="การสืบค้น";
+            hint="กรุณากรอกชื่อผลิตภัณฑ์เพื่อค้นหาค่ะ";
+            empty="กรุณากรอกชื่อย่อค่ะ";
+        }
+
+        else if(lang.equalsIgnoreCase("Viet")) {
+            search="Tìm kiếm";
+            hint="Hãy nhập tên thuốc loại thuốc để tìm kiếm.";
+            empty="Hãy nhập tên thuốc.";
+        }
+
+        else {
+            search="检索";
+            hint="请输入需要检查的医药品.";
+            empty="请输入药名.";
+        }
+        
+        bt_medicine_list.setText(search);
+        et_medicine_list.setHint(hint);
+        
+        bt_medicine_list.setOnClickListener(new Button.OnClickListener() {
+            @SuppressLint("HandlerLeak")
+            @Override
+            public void onClick(View view) {
+
+                if (et_medicine_list.getText().toString().length() == 0) {
+                    Toast.makeText(Medicine_List.this, empty, Toast.LENGTH_SHORT).show();
+                    et_medicine_list.requestFocus();
+                    return;
+                }
+                
+                String search = et_medicine_list.getText().toString();
+                try {
+                    String searchUrl = "http://localapi.health.kr:8090/totalProduceY.localapi?search_word=" +
+                            URLEncoder.encode(search, "UTF-8") + "&search_flag=all&sunb_count=&callback=&_=";
+                    new_get.execute(searchUrl);
+
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    public void onClick(View v)
+    {
+        View oParentView = (View)v.getParent().getParent().getParent().getParent();
+        String _position = (String) oParentView.getTag();
+        Log.d("position", _position);
+
+        int position= Integer.valueOf(_position);
+
+       Intent intent = new Intent( Medicine_List.this, Translation.class);
+       intent.putExtra("medicine_code", new_get.druglist[position][1]);
+       startActivity(intent);
+    }
+
+
+    private class getList extends AsyncTask<String, Integer, String> {
+
+        String[][] druglist;
+        Bitmap[] img;
+
+        @Override
+        protected String doInBackground(String... search) {
+            String contents = "존재하지 않는 결과 입니다.";
+
+            boolean check = FALSE;
+            try {
+                ConnectServer connectServer = new ConnectServer();
+                contents = connectServer.requestGet(search[0]);
+                check = TRUE;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (!check) return contents;
+            try {
+                JSONArray jarray = new JSONArray(contents);
+                druglist = new String[jarray.length()][3];
+                img = new Bitmap[jarray.length()];
+                Log.d("RRRR",jarray.length()+"");
+                for (int i = 0; i < jarray.length(); i++) {
+                    JSONObject jObject = null;
+                    jObject = jarray.getJSONObject(i);
+                    druglist[i][0] = jObject.getString("drug_name");
+                    druglist[i][1] = jObject.getString("drug_code");
+                    druglist[i][2] = jObject.getString("pack_img");
+
+                    System.out.println(i+" "+druglist[i][1]);
+                    System.out.println(i+" "+druglist[i][2]);
+                    System.out.println((i+1)+jarray.length());
+
+                    Log.d("RRRR",""+druglist[i][0].equals(""));
+                    Log.d("RRRR",""+(druglist[i][0]!=null));
+
+                    try{
+                        URL url = new URL(druglist[i][2]);
+                        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                        conn.setDoInput(true);
+                        conn.connect();
+
+                        InputStream is = conn.getInputStream();
+                        img[i] = BitmapFactory.decodeStream(is);
+                    } catch (MalformedURLException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return contents;
+        }
+
+        protected void onPostExecute(String data){
+
+            Drawable drawable = getResources().getDrawable(R.drawable.noimage);
+            Bitmap bitmap_noimage = ((BitmapDrawable)drawable).getBitmap();
+
+            if(data!=null) {
+                for (int i = 0; i < druglist.length; i++) {
+                    List_Element item = new List_Element();
+                    item.medicine_name = druglist[i][0];
+                    item.medicine_code = druglist[i][1];
+                    if(img[i]==null) item.medicine_image= bitmap_noimage;
+                    else item.medicine_image = img[i];
+                    item.onClickListener =  click_listener.onClickListener;
+                    oData.add(item);
+                }
+            }
+            medicine_ListView = (ListView) findViewById(R.id.medicine_list_view);
+            List_Adapter oAdapter = new List_Adapter(oData, lang);
+            medicine_ListView.setAdapter(oAdapter);
+        }
+    }
+}
