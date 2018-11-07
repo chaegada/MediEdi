@@ -1,6 +1,6 @@
 # MediEdi
 
-<b><depencency></b>
+<b>depencency</b>
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.squareup.okhttp3:okhttp:3.5.0'
     implementation 'com.android.support:appcompat-v7:28.0.0-alpha3'
