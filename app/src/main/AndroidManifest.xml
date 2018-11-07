@@ -10,13 +10,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
        
+
+        <activity android:name=".Medicine_List"></activity>
+
         <activity android:name=".WordSearch"></activity>
         <activity android:name=".InternetAccess"></activity>
         <activity android:name=".Change_Lang"></activity>
         <activity android:name=".Link"></activity>
         <activity android:name=".Change_Emphasis"></activity>
         <activity android:name="Barcode"></activity>
+
         <activity android:name=".Translation"></activity>
         <activity android:name=".List"></activity>
         <activity android:name=".Select_Function"></activity>
