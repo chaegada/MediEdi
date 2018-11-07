@@ -54,3 +54,26 @@ xml 파서를 이용해 해당하는 바코드 번호의 의약품명을 String�
 ▹ 병·의원 위치찾기  
 병원의 위도, 경도 변수를 받아서 마커를 전국적으로 출력  
 OnClickListener를 마커에 적용해서 다음 레이아웃에 정보를 출력후 번역문으로 넘김  
+
+## ▸ 4. dependencies
+implementation fileTree(dir: 'libs', include: ['*.jar'])  
+implementation 'com.squareup.okhttp3:okhttp:3.5.0'  
+implementation 'com.android.support:appcompat-v7:28.0.0-alpha3'  
+implementation 'com.android.support.constraint:constraint-layout:1.1.2'  
+testImplementation 'junit:junit:4.12'  
+androidTestImplementation 'com.android.support.test:runner:1.0.2'  
+androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'  
+implementation 'com.google.code.gson:gson:2.8.0'  
+implementation 'com.google.android.gms:play-services-maps:15.0.1'  
+implementation 'com.google.android.gms:play-services-location:15.0.1'  
+implementation 'com.google.android.gms:play-services-places:15.0.1'  
+implementation 'com.android.support:support-media-compat:28.0.0'  
+implementation 'com.android.support:support-v4:28.0.0'  
+implementation 'com.android.support:design:28.0.0'  
+implementation 'com.android.support:appcompat-v7:28.0.0'     
+implementation 'com.journeyapps:zxing-android-embedded:3.5.0'  
+implementation 'net.sourceforge.jexcelapi:jxl:2.6.12'  
+
+## ▸ 5. 출처
+### ▸ zxing barcode 출처: https://github.com/journeyapps/zxing-android-embedded
+
